@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/transactions/{id}/pay', [TransactionController::class, 'pay']);
     
     // FITUR BARU: Tautkan transaksi ke pihak kedua (Sync)
-    Route::post('/transactions/{id}/sync', [TransactionController::class, 'sync']);
+    Route::post('/transactions/{token}/sync', [TransactionController::class, 'sync']);
     
     // FITUR BARU: Hapus Transaksi
     Route::delete('/transactions/{id}', [TransactionController::class, 'destroy']);

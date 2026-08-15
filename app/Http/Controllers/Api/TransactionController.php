@@ -68,7 +68,6 @@ class TransactionController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
-            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Android akan mengirim file < 1MB
         ]);
 
         $userId = $request->user()->id;
@@ -87,26 +86,10 @@ class TransactionController extends Controller
         }
         $transaction->save();
 
-        // FITUR BARU: Simpan Gambar ke folder Publik
-        $proofImagePath = null;
-        if ($request->hasFile('proof_image')) {
-            $file = $request->file('proof_image');
-            $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $file->getClientOriginalExtension();
-            
-            // Simpan langsung ke public/uploads/proofs (Bypass Symlink)
-            $destinationPath = public_path('uploads/proofs');
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-            $file->move($destinationPath, $filename);
-            $proofImagePath = 'uploads/proofs/' . $filename;
-        }
-
         $transaction->logs()->create([
             'transaction_id' => $transaction->id,
             'user_id' => $userId,
             'amount' => $payment,
-            'proof_image' => $proofImagePath,
             'status' => 'ACCEPTED'
         ]);
 
@@ -117,13 +100,16 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function sync(Request $request, $id)
+    // FUNGSI BARU: Mengaitkan transaksi ke Pengguna Lain (Kolaborasi)
+    public function sync(Request $request, $token)
     {
         $userId = $request->user()->id;
-        $transaction = Transaction::find($id);
+        
+        // Cari berdasarkan Token unik (Tautan), bukan ID berurutan!
+        $transaction = Transaction::where('token', $token)->first();
 
         if (!$transaction) {
-            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
+            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan atau tautan tidak valid.'], 404);
         }
 
         if ($transaction->creator_id === $userId) {
