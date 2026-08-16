@@ -68,7 +68,6 @@ class AuthController extends Controller
             }
 
         } catch (\Exception $e) {
-            // Log error jika terjadi masalah (misal koneksi ke Google gagal)
             Log::error('Google Login Error: ' . $e->getMessage());
             
             return response()->json([
@@ -78,9 +77,19 @@ class AuthController extends Controller
         }
     }
 
+    // FITUR BARU: Simpan Token HP Android untuk Notifikasi
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate(['token' => 'required|string']);
+        $request->user()->update(['fcm_token' => $request->token]);
+
+        return response()->json(['success' => true, 'message' => 'FCM Token diperbarui']);
+    }
+
     public function logout(Request $request)
     {
-        // Hapus token pengguna saat ini (Logout dari Android)
+        // Hapus token API dan FCM saat logout agar tidak dapat notifikasi nyasar
+        $request->user()->update(['fcm_token' => null]);
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([

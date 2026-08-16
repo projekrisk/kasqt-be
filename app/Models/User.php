@@ -12,7 +12,7 @@ class User extends Authenticatable implements HasAvatar
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'google_id', 'avatar_url', 'password', 'role'
+        'name', 'email', 'google_id', 'avatar_url', 'password', 'role', 'fcm_token'
     ];
 
     protected $hidden = [

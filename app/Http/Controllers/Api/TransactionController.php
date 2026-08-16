@@ -106,6 +106,21 @@ class TransactionController extends Controller
             'status' => 'ACCEPTED'
         ]);
 
+        // FITUR BARU: KIRIM NOTIFIKASI KE PIHAK LAWAN (JIKA ADA)
+        $otherUserId = ($transaction->creator_id === $userId) ? $transaction->counterparty_id : $transaction->creator_id;
+        
+        if ($otherUserId) {
+            $otherUser = \App\Models\User::find($otherUserId);
+            if ($otherUser && $otherUser->fcm_token) {
+                // Panggil Tukang Pos (FcmService)
+                $rupiah = number_format($payment, 0, ',', '.');
+                $title = "Pembayaran Baru 💰";
+                $body = "Pembayaran sebesar Rp {$rupiah} telah dicatat untuk: " . $transaction->description;
+                
+                \App\Services\FcmService::sendNotification($otherUser->fcm_token, $title, $body);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Pembayaran berhasil dicatat',

@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     });
 
+    Route::post('/user/fcm-token', [AuthController::class, 'updateFcmToken']);
+    
+
     // Logout
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
