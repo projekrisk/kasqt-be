@@ -92,9 +92,19 @@ class AuthController extends Controller
         $request->user()->update(['fcm_token' => null]);
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Berhasil logout'
-        ], 200);
+        return response()->json(['success' => true, 'message' => 'Berhasil logout'], 200);
+    }
+
+    public function updatePhone(Request $request)
+    {
+        $request->validate(['phone_number' => 'required|string']);
+        
+        // Bersihkan spasi/simbol dan ubah 08 menjadi 628
+        $clean = preg_replace('/[^0-9]/', '', $request->phone_number);
+        if (substr($clean, 0, 1) === '0') $clean = '62' . substr($clean, 1);
+
+        $request->user()->update(['phone_number' => $clean]);
+        
+        return response()->json(['success' => true, 'message' => 'Nomor WA Anda berhasil disimpan!']);
     }
 }

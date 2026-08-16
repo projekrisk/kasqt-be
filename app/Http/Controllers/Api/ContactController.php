@@ -94,11 +94,7 @@ class ContactController extends Controller
             'phone_number' => $request->phone_number,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kontak berhasil diperbarui',
-            'data' => $contact
-        ]);
+        return response()->json(['success' => true, 'message' => 'Kontak berhasil diperbarui', 'data' => $contact]);
     }
 
     public function destroy(Request $request, $id)
@@ -115,6 +111,49 @@ class ContactController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Kontak berhasil dihapus.'
+        ]);
+    }
+
+    public function syncPhonebook(Request $request)
+    {
+        $request->validate(['phone_numbers' => 'required|array']);
+        $userId = $request->user()->id;
+
+        // 1. Bersihkan & seragamkan format semua nomor dari HP
+        $normalizedNumbers = [];
+        foreach ($request->phone_numbers as $phone) {
+            $clean = preg_replace('/[^0-9]/', '', $phone);
+            if (substr($clean, 0, 1) === '0') $clean = '62' . substr($clean, 1);
+            if (!empty($clean)) $normalizedNumbers[] = $clean;
+        }
+
+        // 2. Cari di database User (Kecuali diri sendiri)
+        $matchedUsers = \App\Models\User::whereIn('phone_number', array_unique($normalizedNumbers))
+                            ->where('id', '!=', $userId)
+                            ->get();
+
+        $addedCount = 0;
+        foreach ($matchedUsers as $match) {
+            $exists = Contact::where('user_id', $userId)->where('phone_number', $match->phone_number)->first();
+            
+            if (!$exists) {
+                // Jika belum ada di kontak, Tambahkan Otomatis menggunakan Nama Akun Google-nya!
+                Contact::create([
+                    'user_id' => $userId,
+                    'name' => $match->name, 
+                    'phone_number' => $match->phone_number,
+                    'is_kasqt_user' => true,
+                ]);
+                $addedCount++;
+            } else {
+                // Jika sudah ada (tapi input manual), perbarui statusnya
+                $exists->update(['is_kasqt_user' => true, 'name' => $match->name]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $addedCount . ' Teman Kasqt berhasil ditemukan & disinkronkan!'
         ]);
     }
 }

@@ -27,6 +27,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/user/fcm-token', [AuthController::class, 'updateFcmToken']);
+
+    Route::post('/user/phone', [AuthController::class, 'updatePhone']);
+    Route::post('/contacts/sync-phonebook', [ContactController::class, 'syncPhonebook']);
     
 
     // Logout
