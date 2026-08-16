@@ -87,19 +87,15 @@ class TransactionController extends Controller
         }
         $transaction->save();
 
-        // FITUR BARU: LOGIKA UPLOAD GAMBAR KE FOLDER PUBLIC
+        // FITUR BARU: UPLOAD GAMBAR MENGGUNAKAN FILESYSTEM LARAVEL (Aman untuk Hosting)
         $proofImagePath = null;
         if ($request->hasFile('proof_image')) {
-            $file = $request->file('proof_image');
-            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            // Fungsi 'store' akan otomatis memakai disk 'public_uploads' yang ada di filesystems.php
+            // Menyimpan ke dalam folder 'proofs' dengan nama file acak yang aman.
+            $path = $request->file('proof_image')->store('proofs', 'public_uploads');
             
-            // Simpan langsung ke public_html/uploads/proofs (Bypass Symlink untuk Hosting)
-            $destinationPath = public_path('uploads/proofs');
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-            $file->move($destinationPath, $filename);
-            $proofImagePath = 'uploads/proofs/' . $filename;
+            // Format teks untuk disimpan ke database: "uploads/proofs/namafileacak.jpg"
+            $proofImagePath = 'uploads/' . $path;
         }
 
         $transaction->logs()->create([
