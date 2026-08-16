@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str; // PENTING: Untuk membuat token acak
+use Illuminate\Support\Str; 
 
 class TransactionController extends Controller
 {
     public function index(Request $request)
     {
         $userId = $request->user()->id;
-        $userEmail = $request->user()->email; // Deteksi via Email (untuk sync pintar)
+        $userEmail = $request->user()->email; 
 
         $transactions = Transaction::with(['contact', 'counterparty', 'logs' => function($q) {
             $q->orderBy('created_at', 'desc');
@@ -22,7 +22,7 @@ class TransactionController extends Controller
             ->orWhereHas('contact', function($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
-            ->orWhereHas('creator', function($q) use ($userEmail) { // Antisipasi duplikasi akun Google ID
+            ->orWhereHas('creator', function($q) use ($userEmail) { 
                 $q->where('email', $userEmail);
             })
             ->orderBy('created_at', 'desc')
@@ -54,7 +54,7 @@ class TransactionController extends Controller
             'due_date' => $request->due_date,
             'status' => 'ACTIVE',
             'description' => $request->description,
-            'token' => Str::random(12), // Tautan Unik
+            'token' => Str::random(12), 
         ]);
 
         return response()->json([
@@ -68,6 +68,7 @@ class TransactionController extends Controller
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
+            'proof_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $userId = $request->user()->id;
@@ -86,10 +87,26 @@ class TransactionController extends Controller
         }
         $transaction->save();
 
+        // FITUR BARU: LOGIKA UPLOAD GAMBAR KE FOLDER PUBLIC
+        $proofImagePath = null;
+        if ($request->hasFile('proof_image')) {
+            $file = $request->file('proof_image');
+            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            
+            // Simpan langsung ke public_html/uploads/proofs (Bypass Symlink untuk Hosting)
+            $destinationPath = public_path('uploads/proofs');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            $file->move($destinationPath, $filename);
+            $proofImagePath = 'uploads/proofs/' . $filename;
+        }
+
         $transaction->logs()->create([
             'transaction_id' => $transaction->id,
             'user_id' => $userId,
             'amount' => $payment,
+            'proof_image' => $proofImagePath,
             'status' => 'ACCEPTED'
         ]);
 
@@ -100,12 +117,10 @@ class TransactionController extends Controller
         ]);
     }
 
-    // FUNGSI BARU: Mengaitkan transaksi ke Pengguna Lain (Kolaborasi)
     public function sync(Request $request, $token)
     {
         $userId = $request->user()->id;
         
-        // Cari berdasarkan Token unik (Tautan), bukan ID berurutan!
         $transaction = Transaction::where('token', $token)->first();
 
         if (!$transaction) {
@@ -133,7 +148,6 @@ class TransactionController extends Controller
         ]);
     }
     
-    // FUNGSI BARU: Hapus Transaksi (Hanya Pembuat yang bisa)
     public function destroy(Request $request, $id)
     {
         $userId = $request->user()->id;
@@ -147,7 +161,7 @@ class TransactionController extends Controller
             return response()->json(['success' => false, 'message' => 'Hanya pembuat yang dapat menghapus transaksi ini.'], 403);
         }
 
-        $transaction->delete(); // Ini otomatis akan menghapus riwayat cicilan karena setting 'cascadeOnDelete' di migrasi
+        $transaction->delete(); 
 
         return response()->json([
             'success' => true,

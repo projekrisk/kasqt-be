@@ -10,7 +10,7 @@ class TransactionLog extends Model
         'transaction_id', 'user_id', 'amount', 'proof_image', 'status'
     ];
 
-    // FITUR BARU: URL Lengkap Gambar
+    // FITUR BARU: URL Lengkap Gambar agar mudah dibaca oleh Android
     protected $appends = ['proof_image_url'];
 
     public function getProofImageUrlAttribute()
