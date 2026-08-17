@@ -1,3 +1,3 @@
 <x-filament-panels::page>
-    {{-- Halaman ini kosong karena otomatis diisi oleh fungsi getHeaderWidgets() dari class Laporan --}}
+    {{-- getHeaderWidgets() --}}
 </x-filament-panels::page>
