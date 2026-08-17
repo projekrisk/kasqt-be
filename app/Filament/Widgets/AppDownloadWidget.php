@@ -9,6 +9,7 @@ class AppDownloadWidget extends Widget
     // Menggunakan tampilan khusus (blade)
     protected static string $view = 'filament.widgets.app-download-widget';
     
-    // Urutan ke-2 (Setelah Widget Statistik User)
-    protected static ?int $sort = 2;
+    // UBAH ANGKA INI MENJADI NEGATIF
+    // Agar tampil tepat di sebelah Account Widget (Selamat Datang) dan sebelum Statistik
+    protected static ?int $sort = -2;
 }

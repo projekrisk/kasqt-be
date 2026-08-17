@@ -2,8 +2,8 @@
     <x-filament::section>
         <div class="flex items-center justify-between gap-4">
             <div class="flex flex-col">
-                <h2 class="text-lg font-bold">Aplikasi Android Kasqt</h2>
-                <p class="text-sm text-gray-500">Dapatkan versi terbaru aplikasi Kasqt di Google Play Store.</p>
+                <h2 class="grid flex-1 text-base font-semibold leading-6 text-gray-950 dark:text-white">Aplikasi Kasqt</h2>
+                <p class="text-sm text-gray-500">Dapatkan aplikasi Kasqt di Play Store.</p>
             </div>
             
             <a href="https://play.google.com/store/apps/details?id=com.kasqt" 
@@ -14,7 +14,7 @@
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Unduh Sekarang
+                Unduh
             </a>
         </div>
     </x-filament::section>
