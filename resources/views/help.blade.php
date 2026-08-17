@@ -27,7 +27,7 @@
             <img src="{{ asset('images/icon.png') }}" alt="Kasqt" class="w-8 h-8 rounded-lg shadow-lg shadow-emerald-900/50 object-cover">
             <span class="text-2xl font-bold tracking-tight text-white">Kasqt<span class="text-kasqt-emerald">.</span></span>
         </a>
-        <a href="{{ url('/') }}" class="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-300">Kembali ke Beranda</a>
+        <a href="{{ url('/') }}" class="text-sm font-medium text-slate-300 hover:text-white transition-colors duration-300">Kembali</a>
     </nav>
 
     <main class="flex-1 w-full max-w-3xl mx-auto px-8 py-32 z-10">
@@ -37,23 +37,20 @@
         </div>
 
         <div class="space-y-4">
-            <!-- FAQ 1 -->
             <div class="glass p-6 rounded-2xl">
                 <h3 class="text-lg font-bold text-white mb-2">Bagaimana cara menautkan transaksi ke teman?</h3>
                 <p class="text-slate-400 text-sm leading-relaxed">
-                    Setelah mencatat transaksi, buka detailnya lalu klik tombol "Bagikan Tautan". Teman Anda cukup mengklik tautan tersebut (via WhatsApp) agar riwayatnya secara otomatis sinkron dengan akun mereka.
+                    Setelah mencatat transaksi, buka detailnya lalu klik tombol <strong>"Bagikan Tautan"</strong>. Teman Anda cukup mengklik tautan tersebut (via WhatsApp) agar riwayatnya secara otomatis sinkron dengan akun mereka.
                 </p>
             </div>
 
-            <!-- FAQ 2 -->
             <div class="glass p-6 rounded-2xl">
                 <h3 class="text-lg font-bold text-white mb-2">Apakah aplikasi ini berbayar?</h3>
                 <p class="text-slate-400 text-sm leading-relaxed">
-                    Aplikasi ini 100% GRATIS untuk fitur utama. Jika Anda ingin mematikan iklan, mengunci dengan sidik jari, atau mencetak Laporan PDF, Anda dapat meningkatkan (*upgrade*) ke versi Kasqt PRO.
+                    Aplikasi ini 100% GRATIS untuk fitur utama. Jika Anda ingin mematikan iklan, mengunci dengan sidik jari, atau mencetak Laporan PDF, Anda dapat meningkatkan <strong>(upgrade) ke versi Kasqt PRO</strong>.
                 </p>
             </div>
 
-            <!-- FAQ 3 -->
             <div class="glass p-6 rounded-2xl border border-kasqt-gold/20">
                 <h3 class="text-lg font-bold text-kasqt-gold mb-2">Masalah dengan Langganan Kasqt PRO?</h3>
                 <p class="text-slate-400 text-sm leading-relaxed">
@@ -62,6 +59,17 @@
             </div>
         </div>
     </main>
+
+    <footer class="absolute bottom-0 w-full px-8 py-6 text-center lg:text-left z-50 pointer-events-none">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-600 font-medium tracking-wide uppercase pointer-events-auto">
+            <span>&copy; {{ date('Y') }} Kasqt. Hak Cipta Dilindungi.</span>
+            <div class="flex gap-4 mt-2 md:mt-0">
+                <a href="{{ url('/privasi') }}" class="hover:text-slate-400 transition-colors">Privasi</a>
+                <a href="{{ url('/ketentuan') }}" class="hover:text-slate-400 transition-colors">Ketentuan</a>
+                <a href="{{ url('/bantuan') }}" class="hover:text-slate-400 transition-colors">Bantuan</a>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

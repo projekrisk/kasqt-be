@@ -50,5 +50,16 @@
         </div>
     </main>
 
+    <footer class="absolute bottom-0 w-full px-8 py-6 text-center lg:text-left z-50 pointer-events-none">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-600 font-medium tracking-wide uppercase pointer-events-auto">
+            <span>&copy; {{ date('Y') }} Kasqt. Hak Cipta Dilindungi.</span>
+            <div class="flex gap-4 mt-2 md:mt-0">
+                <a href="{{ url('/privasi') }}" class="hover:text-slate-400 transition-colors">Privasi</a>
+                <a href="{{ url('/ketentuan') }}" class="hover:text-slate-400 transition-colors">Ketentuan</a>
+                <a href="{{ url('/bantuan') }}" class="hover:text-slate-400 transition-colors">Bantuan</a>
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
