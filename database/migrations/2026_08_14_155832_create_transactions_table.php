@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('token', 64)->unique()->nullable(); // FITUR BARU: Token unik untuk link yang aman
+            $table->string('token', 64)->unique()->nullable();
             $table->foreignId('creator_id')->constrained('users')->cascadeOnDelete(); 
             $table->foreignId('contact_id')->nullable()->constrained('contacts')->nullOnDelete(); 
             $table->foreignId('counterparty_id')->nullable()->constrained('users')->nullOnDelete(); 

@@ -27,7 +27,7 @@ class TransactionsChart extends ChartWidget
                 [
                     'label' => 'Total Catatan',
                     'data' => $data,
-                    'backgroundColor' => '#F59E0B', // Emas/Amber
+                    'backgroundColor' => '#F59E0B',
                 ],
             ],
             'labels' => $months,

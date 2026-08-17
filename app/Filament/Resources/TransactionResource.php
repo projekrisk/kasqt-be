@@ -13,14 +13,9 @@ use Filament\Tables\Table;
 class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-    
-
-    // Tambahkan 4 baris ini untuk mengubah nama dan URL ke Bahasa Indonesia
     protected static ?string $modelLabel = 'Transaksi';
     protected static ?string $navigationGroup = 'Manajemen';
-
     protected static ?string $pluralModelLabel = 'Transaksi';
     protected static ?string $navigationLabel = 'Transaksi';
     protected static ?string $slug = 'transaksi';

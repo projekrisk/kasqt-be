@@ -12,7 +12,6 @@
     </style>
 </head>
 <body class="antialiased min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-    <!-- Glow effects -->
     <div class="absolute w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl -top-40 -right-20 pointer-events-none"></div>
     <div class="absolute w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-3xl -bottom-20 -left-20 pointer-events-none"></div>
 
@@ -42,7 +41,6 @@
         </div>
     </div>
 
-    <!-- Trik Auto-Redirect ke Aplikasi -->
     <script>
         window.onload = function() {
             setTimeout(function() {

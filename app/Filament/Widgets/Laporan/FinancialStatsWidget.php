@@ -8,21 +8,17 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class FinancialStatsWidget extends BaseWidget
 {
-    // Cegah muncul di Dasbor Utama
     protected static bool $isDiscovered = false;
 
-    // Memakan 2 kolom penuh
     protected int | string | array $columnSpan = 'full';
 
     protected function getStats(): array
     {
         $totalPro = User::where('is_pro', true)->count();
         
-        // ALGORITMA SIMULASI: Anggap 70% pengguna memilih paket Tahunan
         $proTahunan = (int) ceil($totalPro * 0.7);
         $proBulanan = $totalPro - $proTahunan;
         
-        // Kalkulasi Pendapatan Kotor
         $pendapatan = ($proTahunan * 99000) + ($proBulanan * 15000);
 
         return [

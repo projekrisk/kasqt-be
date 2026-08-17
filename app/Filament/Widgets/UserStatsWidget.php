@@ -8,7 +8,6 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class UserStatsWidget extends BaseWidget
 {
-    // Menempatkan widget ini di urutan paling atas di Dashboard
     protected static ?int $sort = 1;
 
     protected function getStats(): array
@@ -23,7 +22,7 @@ class UserStatsWidget extends BaseWidget
                 ->description('Membayar langganan')
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning')
-                ->chart([7, 2, 10, 3, 15, 4, 17]), // Grafik simulasi naik-turun
+                ->chart([7, 2, 10, 3, 15, 4, 17]),
                 
             Stat::make('Pengguna Gratis', User::where('is_pro', false)->count())
                 ->description('Belum berlangganan')

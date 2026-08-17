@@ -14,7 +14,6 @@ class TransactionController extends Controller
         $userId = $request->user()->id;
         $userEmail = $request->user()->email; 
 
-        // FITUR DIPERBARUI: Tambahkan 'creator' agar pihak lawan tahu nama pembuatnya
         $transactions = Transaction::with(['contact', 'counterparty', 'creator', 'logs' => function($q) {
             $q->orderBy('created_at', 'desc');
         }])
@@ -99,7 +98,6 @@ class TransactionController extends Controller
         $userId = $request->user()->id;
         $transaction = Transaction::where('id', $id)->firstOrFail();
 
-        // 1. LOGIKA UPLOAD GAMBAR (Diperbarui agar lebih kebal error)
         $proofImagePath = null;
         if ($request->hasFile('proof_image')) {
             $file = $request->file('proof_image');
@@ -111,7 +109,6 @@ class TransactionController extends Controller
             $proofImagePath = 'uploads/proofs/' . $filename;
         }
 
-        // 2. Tentukan Status: Jika pembuat yang bayar/nyicil, langsung ACCEPTED. Jika pihak lawan, PENDING.
         $isCreator = $transaction->creator_id === $userId;
         $logStatus = $isCreator ? 'ACCEPTED' : 'PENDING';
 
@@ -123,17 +120,14 @@ class TransactionController extends Controller
             'status' => $logStatus
         ]);
 
-        // 3. Jika langsung Accepted (Pembuat yang input), potong tagihan
         if ($isCreator) {
             $newRemaining = max(0, $transaction->remaining_amount - $request->amount);
             $transaction->update(['remaining_amount' => $newRemaining, 'status' => $newRemaining <= 0 ? 'PAID' : 'ACTIVE']);
             
-            // Beri tahu pihak lawan (jika dia punya app)
             if ($transaction->counterparty_id) {
                 $this->sendFCM($transaction->counterparty->fcm_token, "Pembaruan Transaksi", "Tagihan Anda telah diperbarui sebesar Rp " . number_format($request->amount, 0, ',', '.'));
             }
         } else {
-            // Jika pihak lawan yang input, kirim notif ke pembuat untuk minta persetujuan
             $this->sendFCM($transaction->creator->fcm_token, "Menunggu Persetujuan", $request->user()->name . " mencatat pembayaran baru. Cek sekarang!");
         }
 
@@ -150,7 +144,6 @@ class TransactionController extends Controller
         $newRemaining = max(0, $transaction->remaining_amount - $log->amount);
         $transaction->update(['remaining_amount' => $newRemaining, 'status' => $newRemaining <= 0 ? 'PAID' : 'ACTIVE']);
 
-        // Notifikasi ke pembayar bahwa disetujui
         if ($transaction->counterparty_id) {
             $this->sendFCM($transaction->counterparty->fcm_token, "Pembayaran Disetujui ✅", "Pembayaran sebesar Rp " . number_format($log->amount, 0, ',', '.') . " telah dikonfirmasi.");
         }

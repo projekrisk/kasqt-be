@@ -31,7 +31,7 @@
     </nav>
 
     <main class="flex-1 w-full max-w-4xl mx-auto px-8 py-32 z-10">
-        <div class="glass p-8 md:p-12 rounded-3xl shadow-2xl">
+        <div>
             <h1 class="text-3xl md:text-4xl font-bold mb-2">Syarat & Ketentuan</h1>
             <p class="text-slate-400 mb-8 text-sm">Efektif mulai: 17 Agustus 2026</p>
 

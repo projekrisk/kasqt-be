@@ -6,28 +6,24 @@
     <title>Kasqt | Catat Finansial, Jaga Relasi</title>
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
 
-    <!-- Primary Meta Tags -->
     <meta name="description" content="Aplikasi pencatatan hutang-piutang dan keuangan kolaboratif yang aman, elegan, dan tersinkronisasi secara real-time. Kelola sirkulasi dana Anda dengan Kasqt.">
     <meta name="keywords" content="aplikasi pencatat hutang, aplikasi keuangan, hutang piutang, kasqt, catat keuangan, aplikasi finansial, buku hutang, pengingat hutang otomatis, aplikasi kas">
     <meta name="author" content="Kasqt">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url('/') }}">
 
-    <!-- Open Graph / Facebook / WhatsApp (Untuk Preview Link) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url('/') }}">
     <meta property="og:title" content="Kasqt | Catat Finansial, Jaga Relasi">
     <meta property="og:description" content="Ekosistem pencatatan hutang-piutang elegan untuk Anda. Transparan, aman, dan tersinkronisasi otomatis.">
     <meta property="og:image" content="{{ asset('images/og-kasqt.png') }}">
 
-    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url('/') }}">
     <meta name="twitter:title" content="Kasqt | Catat Finansial, Jaga Relasi">
     <meta name="twitter:description" content="Ekosistem pencatatan hutang-piutang elegan untuk Anda. Transparan, aman, dan tersinkronisasi otomatis.">
     <meta name="twitter:image" content="{{ asset('images/og-kasqt.png') }}">
 
-    <!-- Schema.org / JSON-LD (Double @ agar tidak error di Blade) -->
     <script type="application/ld+json">
     {
       "@@context": "https://schema.org",
@@ -61,11 +57,11 @@
                     },
                     colors: {
                         kasqt: {
-                            dark: '#020617', // Slate 950
-                            card: '#0F172A', // Slate 900
-                            emerald: '#10B981', // Emerald 500
-                            emerald_dark: '#065F46', // Emerald 800
-                            gold: '#F59E0B', // Amber 500
+                            dark: '#020617',
+                            card: '#0F172A',
+                            emerald: '#10B981',
+                            emerald_dark: '#065F46',
+                            gold: '#F59E0B',
                         }
                     },
                     animation: {
@@ -84,17 +80,15 @@
         }
     </script>
     <style>
-        /* Base Reset to enforce Single Screen constraint */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden; /* Mencegah scrolling halaman */
+            overflow: hidden;
             background-color: #020617;
             color: #ffffff;
         }
 
-        /* Glassmorphism Utilities */
         .glass {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
@@ -102,7 +96,6 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* Ambient Glows */
         .glow-emerald {
             position: absolute;
             width: 600px;
@@ -125,7 +118,6 @@
             z-index: 0;
         }
         
-        /* Custom scrollbar for modal */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
@@ -142,7 +134,6 @@
             <span class="text-2xl font-bold tracking-tight">Kasqt<span class="text-kasqt-emerald">.</span></span>
         </div>
 
-        <!-- Desktop Menu -->
         <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
             <a href="#" onclick="openInfoModal('fitur'); return false;" class="hover:text-white transition-colors duration-300">Fitur</a>
             <a href="#" onclick="openInfoModal('keamanan'); return false;" class="hover:text-white transition-colors duration-300">Keamanan</a>
@@ -152,7 +143,6 @@
             </a>
         </div>
 
-        <!-- Hamburger Menu Button untuk Mobile -->
         <button class="md:hidden text-slate-300 hover:text-white" onclick="toggleMobileMenu()">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
@@ -160,7 +150,6 @@
 
     <main class="relative z-10 flex-1 flex flex-col lg:flex-row items-center px-8 md:px-16 lg:px-24 w-full max-w-7xl mx-auto h-full pb-10 lg:pb-0">
         
-        <!-- Left Column: Typography & CTAs -->
         <div class="w-full lg:w-1/2 flex flex-col justify-center gap-6 mt-10 lg:mt-0 relative z-20">
             
             <h1 class="text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight">
@@ -173,9 +162,7 @@
             </p>
 
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
-                <!-- Google Play Button Mockup -->
                 <button class="flex items-center gap-3 bg-white text-kasqt-dark px-6 py-3.5 rounded-xl font-semibold hover:scale-105 transition-transform duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                    <!-- Google Play Original Colorful Icon SVG -->
                     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3.1,3.4C2.9,3.6 2.8,3.9 2.8,4.3L2.8,19.7C2.8,20.1 2.9,20.4 3.1,20.6L3.2,20.7L12.5,11.5L12.5,11.4L3.2,2.3L3.1,3.4Z" fill="#3bccff"/>
                         <path d="M15.6,14.6L12.5,11.5L12.5,11.4L15.6,8.3L15.7,8.4L19.3,10.5C20.3,11 20.3,11.9 19.3,12.5L15.7,14.5L15.6,14.6Z" fill="#ffc73c"/>
@@ -188,14 +175,12 @@
                     </div>
                 </button>
 
-                <!-- PRO Details Button -->
                 <button onclick="openInfoModal('pro')" class="flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-slate-300 hover:text-white border border-slate-700 hover:border-kasqt-gold/50 bg-slate-800/50 hover:bg-slate-800 transition-all duration-300 group">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-kasqt-gold group-hover:fill-kasqt-gold/20 transition-all"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     Jelajahi PRO
                 </button>
             </div>
             
-            <!-- Social Proof -->
             <div class="flex items-center gap-4 mt-8">
                 <div class="flex -space-x-3">
                     <img src="https://ui-avatars.com/api/?name=A+B&background=0f172a&color=fff&rounded=true" alt="User" class="w-8 h-8 rounded-full border-2 border-kasqt-dark">
@@ -209,19 +194,10 @@
         </div>
 
         <div class="hidden lg:flex w-1/2 h-full justify-center items-center relative perspective-[1000px]">
-            <!-- Decorative Elements -->
             <div class="absolute w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl mix-blend-screen animate-float"></div>
-            
-            <!-- Abstract App Mockup -->
-            <div class="w-[320px] h-[650px] bg-[#090E17] border-[6px] border-slate-800 rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(16,185,129,0.3)] relative overflow-hidden animate-float z-10 flex flex-col">
-                
-                <!-- Notch -->
+            <div class="w-[320px] h-[650px] bg-[#090E17] border-[6px] border-slate-800 rounded-[3rem] shadow-[0_30px_60px_-15px_rgba(16,185,129,0.3)] relative overflow-hidden animate-float z-10 flex flex-col">               
                 <div class="absolute top-0 inset-x-0 h-6 bg-slate-800 rounded-b-3xl w-32 mx-auto z-50"></div>
-                
-                <!-- Mockup Content: Dashboard -->
                 <div class="flex-1 p-6 pt-12 flex flex-col gap-6 relative">
-                    
-                    <!-- Header -->
                     <div class="flex justify-between items-center">
                         <div>
                             <div class="w-16 h-3 bg-slate-800 rounded-full mb-2"></div>
@@ -230,7 +206,6 @@
                         <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700"></div>
                     </div>
 
-                    <!-- Balance Card -->
                     <div class="w-full h-36 bg-gradient-to-br from-kasqt-emerald_dark to-emerald-900 rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden shadow-lg shadow-emerald-900/50">
                         <div class="absolute -right-8 -top-8 w-32 h-32 bg-white/5 rounded-full"></div>
                         <div class="w-24 h-3 bg-white/40 rounded-full"></div>
@@ -243,11 +218,9 @@
                         </div>
                     </div>
 
-                    <!-- Recent Activity List -->
                     <div class="flex flex-col gap-4">
                         <div class="w-32 h-3 bg-slate-800 rounded-full mb-1"></div>
                         
-                        <!-- Item 1 (Piutang) -->
                         <div class="w-full h-16 glass rounded-xl flex items-center px-4 gap-4 border border-slate-800">
                             <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
@@ -259,7 +232,6 @@
                             <div class="w-16 h-3 bg-emerald-400 rounded-full"></div>
                         </div>
 
-                        <!-- Item 2 (Hutang) -->
                         <div class="w-full h-16 glass rounded-xl flex items-center px-4 gap-4 border border-slate-800">
                             <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
@@ -271,7 +243,6 @@
                             <div class="w-14 h-3 bg-slate-500 rounded-full"></div>
                         </div>
                         
-                        <!-- Item 3 (Lunas) -->
                         <div class="w-full h-16 glass rounded-xl flex items-center px-4 gap-4 border border-slate-800 opacity-50">
                             <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -284,13 +255,11 @@
                     </div>
                 </div>
 
-                <!-- Floating FAB Mockup -->
                 <div class="absolute bottom-6 right-6 w-14 h-14 bg-kasqt-emerald rounded-full shadow-lg shadow-emerald-900 flex items-center justify-center">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </div>
             </div>
 
-            <!-- Accent Card overlapping -->
             <div class="absolute -right-12 bottom-32 w-48 p-4 glass rounded-2xl border border-white/10 shadow-2xl animate-float-delayed z-20 flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-kasqt-gold/20 flex items-center justify-center">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -304,7 +273,6 @@
 
     </main>
 
-    <!-- Footer -->
     <footer class="absolute bottom-0 w-full px-8 py-6 text-center lg:text-left z-50 pointer-events-none">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-600 font-medium tracking-wide uppercase pointer-events-auto">
             <span>&copy; {{ date('Y') }} Kasqt. Hak Cipta Dilindungi.</span>
@@ -316,7 +284,6 @@
         </div>
     </footer>
 
-    <!-- Hamburger Modal Mobile -->
     <div id="mobileMenu" class="fixed inset-0 z-[60] bg-kasqt-dark/95 backdrop-blur-lg flex-col items-center justify-center gap-8 hidden opacity-0 transition-opacity duration-300">
         <button class="absolute top-8 right-8 text-slate-400 hover:text-white" onclick="toggleMobileMenu()">
              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -329,18 +296,13 @@
         </a>
     </div>
 
-    <!-- Info Modal / Bottom Sheet -->
     <div id="infoModal" class="fixed inset-0 z-[100] hidden">
-        <!-- Backdrop yang bisa diklik untuk menutup -->
         <div id="modalBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 cursor-pointer" onclick="closeInfoModal()"></div>
         
-        <!-- Pembungkus Modal agar posisinya pas -->
         <div class="absolute inset-0 pointer-events-none flex flex-col justify-end md:justify-center items-center p-0 md:p-4">
             
-            <!-- Panel Putih / Gelap Modal -->
             <div id="modalPanel" class="w-full md:max-w-md bg-kasqt-card border border-slate-800 rounded-t-[2.5rem] md:rounded-3xl shadow-2xl pointer-events-auto transform translate-y-full md:translate-y-4 md:scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[85vh]">
                 
-                <!-- Garis Drag Mobile -->
                 <div class="w-full flex justify-center pt-4 pb-2 md:hidden cursor-pointer" onclick="closeInfoModal()">
                     <div class="w-12 h-1.5 bg-slate-700 rounded-full"></div>
                 </div>
@@ -348,15 +310,12 @@
                 <div class="p-8 overflow-y-auto pt-4 md:pt-8">
                     <div class="flex justify-between items-start mb-6">
                         <h3 id="modalTitle" class="text-2xl font-bold text-white tracking-tight">Title</h3>
-                        <!-- Tombol Tutup Silang (Hanya tampil di Desktop) -->
                         <button onclick="closeInfoModal()" class="text-slate-400 hover:text-white md:block hidden bg-slate-800 rounded-full p-1.5 transition">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                         </button>
                     </div>
                     <div id="modalContent" class="text-slate-300 text-sm leading-relaxed space-y-4">
-                        <!-- Konten disuntik via JS -->
                     </div>
-                    <!-- Tombol Tutup Besar (Hanya tampil di Mobile) -->
                     <button onclick="closeInfoModal()" class="mt-8 w-full bg-slate-800 text-white font-semibold py-3.5 rounded-xl hover:bg-slate-700 transition md:hidden active:scale-95">
                         Tutup Panel
                     </button>
@@ -366,7 +325,6 @@
     </div>
 
     <script>
-        // Database Konten Modal
         const modalData = {
             fitur: {
                 title: "Fitur Unggulan",
@@ -423,27 +381,21 @@
             }
         };
 
-        // Modal Controller
         function openInfoModal(type) {
             const data = modalData[type];
             if(!data) return;
 
-            // Suntik teks
             document.getElementById('modalTitle').innerHTML = data.title;
             document.getElementById('modalContent').innerHTML = data.content;
 
-            // Ambil elemen
             const modal = document.getElementById('infoModal');
             const backdrop = document.getElementById('modalBackdrop');
             const panel = document.getElementById('modalPanel');
             
-            // Tampilkan wrapper utama
             modal.classList.remove('hidden');
             
-            // Paksa browser membaca DOM agar transisi berjalan mulus
             void modal.offsetWidth; 
             
-            // Jalankan animasi masuk
             backdrop.classList.remove('opacity-0');
             panel.classList.remove('opacity-0', 'translate-y-full', 'md:translate-y-4', 'md:scale-95');
         }
@@ -453,11 +405,9 @@
             const backdrop = document.getElementById('modalBackdrop');
             const panel = document.getElementById('modalPanel');
             
-            // Jalankan animasi keluar (melorot/menghilang)
             backdrop.classList.add('opacity-0');
             panel.classList.add('opacity-0', 'translate-y-full', 'md:translate-y-4', 'md:scale-95');
             
-            // Sembunyikan wrapper setelah animasi (300ms) selesai
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);

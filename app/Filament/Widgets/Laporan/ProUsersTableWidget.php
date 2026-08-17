@@ -11,8 +11,7 @@ class ProUsersTableWidget extends BaseWidget
 {
     protected static ?string $heading = 'Daftar Pengguna PRO Aktif';
     protected static bool $isDiscovered = false;
-    
-    // Tabel memakan ruang penuh (2 kolom)
+        
     protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table

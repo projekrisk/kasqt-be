@@ -12,7 +12,6 @@ class FcmService
         if (!$token) return false;
 
         try {
-            // 1. Baca Kunci Master (File JSON)
             $credentialsFilePath = storage_path('firebase-credentials.json');
             if (!file_exists($credentialsFilePath)) {
                 Log::error('FCM Error: File firebase-credentials.json tidak ditemukan di folder storage.');
@@ -24,7 +23,6 @@ class FcmService
             $clientEmail = $credentials['client_email'];
             $privateKey = $credentials['private_key'];
 
-            // 2. Buat Tanda Tangan Keamanan (JWT) Otomatis Tanpa Library Eksternal
             $header = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
             $now = time();
             $payload = json_encode([
@@ -43,7 +41,6 @@ class FcmService
 
             $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
 
-            // 3. Tukar Tanda Tangan dengan Tiket Akses Google
             $tokenResponse = Http::asForm()->post('https://oauth2.googleapis.com/token', [
                 'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                 'assertion' => $jwt
@@ -56,7 +53,6 @@ class FcmService
 
             $accessToken = $tokenResponse->json('access_token');
 
-            // 4. Kirim Notifikasi ke HP Pengguna (HTTP v1 API Terbaru)
             $fcmUrl = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
             $messageData = [
                 'message' => [
@@ -65,14 +61,13 @@ class FcmService
                         'title' => $title,
                         'body' => $body
                     ],
-                    'data' => [ // Data tambahan agar penangkap di Android bekerja
+                    'data' => [ 
                         'title' => $title,
                         'body' => $body
                     ]
                 ]
             ];
 
-            // 5. Eksekusi Pengiriman
             $response = Http::withToken($accessToken)->post($fcmUrl, $messageData);
             return $response->successful();
 

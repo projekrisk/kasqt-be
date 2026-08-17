@@ -12,45 +12,36 @@ class AuthController extends Controller
 {
     public function googleLogin(Request $request)
     {
-        // 1. Validasi request dari Android memastikan id_token dikirim
         $request->validate([
             'id_token' => 'required|string',
         ]);
 
         try {
-            // 2. Inisialisasi Google Client
             $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
             
-            // === TAMBAHKAN 2 BARIS INI UNTUK BYPASS SSL DI LOCALHOST ===
             $guzzleClient = new \GuzzleHttp\Client(['verify' => false]);
             $client->setHttpClient($guzzleClient);
-            // ============================================================
-            
-            // 3. Verifikasi token yang dikirim dari Android ke server Google
+
             $payload = $client->verifyIdToken($request->id_token);
 
             if ($payload) {
-                // 4. Jika valid, ekstrak data user dari payload Google
                 $googleId = $payload['sub'];
                 $email = $payload['email'];
                 $name = $payload['name'];
                 $avatarUrl = $payload['picture'] ?? null;
 
-                // 5. Cari atau Buat User baru di database kita
                 $user = User::updateOrCreate(
-                    ['email' => $email], // Cari berdasarkan email
+                    ['email' => $email],
                     [
                         'name' => $name,
                         'google_id' => $googleId,
                         'avatar_url' => $avatarUrl,
-                        'role' => 'user', // Set default role sebagai user aplikasi
+                        'role' => 'user',
                     ]
                 );
 
-                // 6. Buat Token Sanctum agar Android bisa mengakses API kita yang diproteksi
                 $token = $user->createToken('android-app-token')->plainTextToken;
 
-                // 7. Kembalikan response sukses ke Android
                 return response()->json([
                     'success' => true,
                     'message' => 'Login Berhasil',
@@ -77,7 +68,6 @@ class AuthController extends Controller
         }
     }
 
-    // FITUR BARU: Simpan Token HP Android untuk Notifikasi
     public function updateFcmToken(Request $request)
     {
         $request->validate(['token' => 'required|string']);
@@ -88,7 +78,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Hapus token API dan FCM saat logout agar tidak dapat notifikasi nyasar
         $request->user()->update(['fcm_token' => null]);
         $request->user()->currentAccessToken()->delete();
 
@@ -99,7 +88,6 @@ class AuthController extends Controller
     {
         $request->validate(['phone_number' => 'required|string']);
         
-        // Bersihkan spasi/simbol dan ubah 08 menjadi 628
         $clean = preg_replace('/[^0-9]/', '', $request->phone_number);
         if (substr($clean, 0, 1) === '0') $clean = '62' . substr($clean, 1);
 

@@ -28,8 +28,8 @@ class UsersChart extends ChartWidget
                     'label' => 'Pengguna Baru',
                     'data' => $data,
                     'fill' => 'start',
-                    'backgroundColor' => 'rgba(16, 185, 129, 0.2)', // Hijau Transparan
-                    'borderColor' => '#10B981', // Hijau Kasqt
+                    'backgroundColor' => 'rgba(16, 185, 129, 0.2)',
+                    'borderColor' => '#10B981',
                 ],
             ],
             'labels' => $months,

@@ -12,13 +12,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('phone_number')->nullable(); // Kolom Baru: Untuk Nomor WA
+            $table->string('phone_number')->nullable();
             $table->string('google_id')->nullable()->unique(); 
             $table->string('avatar_url')->nullable(); 
             $table->enum('role', ['admin', 'user'])->default('user'); 
-            $table->boolean('is_pro')->default(false); // Kolom Baru: Status Langganan
+            $table->boolean('is_pro')->default(false);
             $table->string('password')->nullable(); 
-            $table->string('fcm_token')->nullable(); // Kolom Baru: Untuk Notifikasi HP
+            $table->string('fcm_token')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -21,7 +21,6 @@ class ContactController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi Input Dasar
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
@@ -34,20 +33,17 @@ class ContactController extends Controller
             ], 422);
         }
 
-        // 2. Pengecekan Nomor Telepon Ganda (Untuk User Ini)
         $existingContact = Contact::where('user_id', $request->user()->id)
             ->where('phone_number', $request->phone_number)
             ->first();
 
         if ($existingContact) {
-            // Jika sudah ada, tolak dan kembalikan pesan error kustom
             return response()->json([
                 'success' => false,
                 'message' => "Nomor ini sudah disimpan sebagai kontak bernama '{$existingContact->name}'."
             ], 409); 
         }
 
-        // 3. Simpan jika aman
         $contact = Contact::create([
             'user_id' => $request->user()->id,
             'name' => $request->name,
@@ -62,7 +58,6 @@ class ContactController extends Controller
         ], 201);
     }
 
-    // FUNGSI BARU: Edit Kontak
     public function update(Request $request, $id)
     {
         $contact = Contact::where('id', $id)->where('user_id', $request->user()->id)->first();
@@ -76,10 +71,9 @@ class ContactController extends Controller
             'phone_number' => 'required|string|max:20',
         ]);
 
-        // Cek apakah nomor yang baru ini sudah dipakai oleh kontak LAIN milik user ini
         $existingContact = Contact::where('user_id', $request->user()->id)
             ->where('phone_number', $request->phone_number)
-            ->where('id', '!=', $id) // Abaikan ID kontak yang sedang diedit ini
+            ->where('id', '!=', $id)
             ->first();
 
         if ($existingContact) {
@@ -105,7 +99,6 @@ class ContactController extends Controller
             return response()->json(['success' => false, 'message' => 'Kontak tidak ditemukan.'], 404);
         }
 
-        // Transaksi lama TIDAK akan terhapus karena 'nullOnDelete()' di database.
         $contact->delete(); 
 
         return response()->json([
@@ -119,7 +112,6 @@ class ContactController extends Controller
         $request->validate(['phone_numbers' => 'required|array']);
         $userId = $request->user()->id;
 
-        // 1. Bersihkan & seragamkan format semua nomor dari HP
         $normalizedNumbers = [];
         foreach ($request->phone_numbers as $phone) {
             $clean = preg_replace('/[^0-9]/', '', $phone);
@@ -127,7 +119,6 @@ class ContactController extends Controller
             if (!empty($clean)) $normalizedNumbers[] = $clean;
         }
 
-        // 2. Cari di database User (Kecuali diri sendiri)
         $matchedUsers = \App\Models\User::whereIn('phone_number', array_unique($normalizedNumbers))
                             ->where('id', '!=', $userId)
                             ->get();
@@ -137,7 +128,6 @@ class ContactController extends Controller
             $exists = Contact::where('user_id', $userId)->where('phone_number', $match->phone_number)->first();
             
             if (!$exists) {
-                // Jika belum ada di kontak, Tambahkan Otomatis menggunakan Nama Akun Google-nya!
                 Contact::create([
                     'user_id' => $userId,
                     'name' => $match->name, 
@@ -146,7 +136,6 @@ class ContactController extends Controller
                 ]);
                 $addedCount++;
             } else {
-                // Jika sudah ada (tapi input manual), perbarui statusnya
                 $exists->update(['is_kasqt_user' => true, 'name' => $match->name]);
             }
         }
