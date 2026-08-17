@@ -17,6 +17,8 @@ class ContactResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-identification';    
 
     protected static ?string $modelLabel = 'Kontak';
+    protected static ?string $navigationGroup = 'Manajemen';
+
     protected static ?string $pluralModelLabel = 'Kontak';
     protected static ?string $navigationLabel = 'Kontak';
     protected static ?string $slug = 'kontak';

@@ -19,6 +19,8 @@ class TransactionResource extends Resource
 
     // Tambahkan 4 baris ini untuk mengubah nama dan URL ke Bahasa Indonesia
     protected static ?string $modelLabel = 'Transaksi';
+    protected static ?string $navigationGroup = 'Manajemen';
+
     protected static ?string $pluralModelLabel = 'Transaksi';
     protected static ?string $navigationLabel = 'Transaksi';
     protected static ?string $slug = 'transaksi';
