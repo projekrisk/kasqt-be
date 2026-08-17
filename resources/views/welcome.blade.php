@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasqt | Catat Finansial, Jaga Relasi</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,9 +100,7 @@
 
     <nav class="relative z-50 w-full px-8 md:px-16 py-6 flex justify-between items-center">
         <div class="flex items-center gap-2 cursor-pointer">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-kasqt-emerald to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-900/50">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7.28V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2.28A2 2 0 0 0 20 15V9a2 2 0 0 0 1-1.72z"/><path d="M20 9v6h-7V9h7z"/><circle cx="16" cy="12" r="1"/></svg>
-            </div>
+            <img src="{{ asset('images/icon.png') }}" alt="Kasqt Logo" class="w-8 h-8 rounded-lg shadow-lg shadow-emerald-900/50 object-cover">
             <span class="text-2xl font-bold tracking-tight">Kasqt<span class="text-kasqt-emerald">.</span></span>
         </div>
 
@@ -136,7 +137,13 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">
                 <!-- Google Play Button Mockup -->
                 <button class="flex items-center gap-3 bg-white text-kasqt-dark px-6 py-3.5 rounded-xl font-semibold hover:scale-105 transition-transform duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5.31 0 .61.1.86.28l14.18 9.93c.68.48.84 1.41.36 2.09-.16.23-.37.42-.61.56L5.3 21.68c-.73.41-1.64.15-2.05-.58-.16-.28-.25-.6-.25-.93zM5 4.5v15l10.74-7.5L5 4.5z"/></svg>
+                    <!-- Google Play Original Colorful Icon SVG -->
+                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.1,3.4C2.9,3.6 2.8,3.9 2.8,4.3L2.8,19.7C2.8,20.1 2.9,20.4 3.1,20.6L3.2,20.7L12.5,11.5L12.5,11.4L3.2,2.3L3.1,3.4Z" fill="#3bccff"/>
+                        <path d="M15.6,14.6L12.5,11.5L12.5,11.4L15.6,8.3L15.7,8.4L19.3,10.5C20.3,11 20.3,11.9 19.3,12.5L15.7,14.5L15.6,14.6Z" fill="#ffc73c"/>
+                        <path d="M15.7,14.5L12.5,11.4L3.1,20.6C3.4,20.9 3.9,20.9 4.5,20.6L15.7,14.5Z" fill="#ff3b3b"/>
+                        <path d="M15.7,8.4L4.5,3.4C3.9,3.1 3.4,3.1 3.1,3.4L12.5,11.4L15.7,8.4Z" fill="#00e676"/>
+                    </svg>
                     <div class="flex flex-col text-left">
                         <span class="text-[10px] leading-tight text-slate-600 uppercase font-bold tracking-wider">Unduh via</span>
                         <span class="text-sm leading-tight">Google Play</span>
@@ -264,9 +271,9 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[11px] text-slate-600 font-medium tracking-wide uppercase pointer-events-auto">
             <span>&copy; {{ date('Y') }} Kasqt. Hak Cipta Dilindungi.</span>
             <div class="flex gap-4 mt-2 md:mt-0">
-                <a href="#" class="hover:text-slate-400 transition-colors">Privasi</a>
-                <a href="#" class="hover:text-slate-400 transition-colors">Ketentuan</a>
-                <a href="#" class="hover:text-slate-400 transition-colors">Bantuan</a>
+                <a href="{{ url('/privasi') }}" class="hover:text-slate-400 transition-colors">Privasi</a>
+                <a href="{{ url('/ketentuan') }}" class="hover:text-slate-400 transition-colors">Ketentuan</a>
+                <a href="{{ url('/bantuan') }}" class="hover:text-slate-400 transition-colors">Bantuan</a>
             </div>
         </div>
     </footer>
