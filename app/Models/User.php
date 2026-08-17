@@ -12,7 +12,7 @@ class User extends Authenticatable implements HasAvatar
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'phone_number', 'google_id', 'avatar_url', 'password', 'role', 'fcm_token'
+        'name', 'email', 'phone_number', 'google_id', 'avatar_url', 'password', 'role', 'fcm_token', 'is_pro'
     ];
 
     protected $hidden = [
@@ -23,6 +23,7 @@ class User extends Authenticatable implements HasAvatar
     {
         return [
             'password' => 'hashed',
+            'is_pro' => 'boolean',
         ];
     }
 

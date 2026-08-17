@@ -48,9 +48,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/transactions', [TransactionController::class, 'store']);
     Route::post('/transactions/{id}/pay', [TransactionController::class, 'pay']);
     
-    // FITUR BARU: Setujui & Tolak Pembayaran
-    Route::post('/transactions/{trxId}/logs/{logId}/approve', [TransactionController::class, 'approvePayment']);
-    Route::post('/transactions/{trxId}/logs/{logId}/reject', [TransactionController::class, 'rejectPayment']);
+    // FITUR BARU: Rute Persetujuan Pembayaran
+    Route::post('/transactions/{id}/approve/{log_id}', [TransactionController::class, 'approvePayment']);
+    Route::post('/transactions/{id}/reject/{log_id}', [TransactionController::class, 'rejectPayment']);
     
     // FITUR BARU: Tautkan transaksi ke pihak kedua (Sync)
     Route::post('/transactions/{token}/sync', [TransactionController::class, 'sync']);

@@ -65,6 +65,30 @@ class TransactionController extends Controller
         ], 201);
     }
 
+    private function sendFCM($deviceToken, $title, $body) 
+    {
+        if (!$deviceToken) return;
+        try {
+            $client = new \Google_Client();
+            $client->setAuthConfig(storage_path('firebase-credentials.json'));
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $client->fetchAccessTokenWithAssertion();
+            $token = $client->getAccessToken();
+
+            $credentials = json_decode(file_get_contents(storage_path('firebase-credentials.json')), true);
+            $projectId = $credentials['project_id'];
+
+            \Illuminate\Support\Facades\Http::withToken($token['access_token'])
+                ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+                    'message' => [
+                        'token' => $deviceToken,
+                        'notification' => [ 'title' => $title, 'body' => $body ],
+                        'data' => [ 'action' => 'REFRESH_TRANSACTIONS' ]
+                    ]
+                ]);
+        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::error("FCM Error: " . $e->getMessage()); }
+    }
+
     public function pay(Request $request, $id)
     {
         $request->validate([
@@ -73,112 +97,79 @@ class TransactionController extends Controller
         ]);
 
         $userId = $request->user()->id;
-        $transaction = Transaction::where('id', $id)
-            ->where(function($q) use ($userId) {
-                $q->where('creator_id', $userId)
-                  ->orWhere('counterparty_id', $userId);
-            })->firstOrFail();
+        $transaction = Transaction::where('id', $id)->firstOrFail();
 
-        $payment = (float) $request->amount;
-        $isCreator = ($userId === $transaction->creator_id);
-        
-        // JIKA PEMBUAT YANG CATAT = LANGSUNG DITERIMA. JIKA PIHAK LAWAN = PENDING.
-        $logStatus = $isCreator ? 'ACCEPTED' : 'PENDING';
-
-        // FITUR BARU: UPLOAD GAMBAR KE FOLDER PUBLIC
+        // 1. LOGIKA UPLOAD GAMBAR (Diperbarui agar lebih kebal error)
         $proofImagePath = null;
         if ($request->hasFile('proof_image')) {
             $file = $request->file('proof_image');
-            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
-            
+            $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $file->getClientOriginalExtension();
             $destinationPath = public_path('uploads/proofs');
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
+            
+            if (!file_exists($destinationPath)) { mkdir($destinationPath, 0755, true); }
             $file->move($destinationPath, $filename);
             $proofImagePath = 'uploads/proofs/' . $filename;
         }
 
-        $transaction->logs()->create([
+        // 2. Tentukan Status: Jika pembuat yang bayar/nyicil, langsung ACCEPTED. Jika pihak lawan, PENDING.
+        $isCreator = $transaction->creator_id === $userId;
+        $logStatus = $isCreator ? 'ACCEPTED' : 'PENDING';
+
+        $log = $transaction->logs()->create([
             'transaction_id' => $transaction->id,
             'user_id' => $userId,
-            'amount' => $payment,
+            'amount' => $request->amount,
             'proof_image' => $proofImagePath,
             'status' => $logStatus
         ]);
 
-        // JIKA PEMBUAT YANG CATAT, SISA TAGIHAN LANGSUNG BERKURANG
+        // 3. Jika langsung Accepted (Pembuat yang input), potong tagihan
         if ($isCreator) {
-            $newRemaining = max(0, $transaction->remaining_amount - $payment);
-            $transaction->remaining_amount = $newRemaining;
-            if ($newRemaining <= 0) {
-                $transaction->status = 'PAID';
+            $newRemaining = max(0, $transaction->remaining_amount - $request->amount);
+            $transaction->update(['remaining_amount' => $newRemaining, 'status' => $newRemaining <= 0 ? 'PAID' : 'ACTIVE']);
+            
+            // Beri tahu pihak lawan (jika dia punya app)
+            if ($transaction->counterparty_id) {
+                $this->sendFCM($transaction->counterparty->fcm_token, "Pembaruan Transaksi", "Tagihan Anda telah diperbarui sebesar Rp " . number_format($request->amount, 0, ',', '.'));
             }
-            $transaction->save();
+        } else {
+            // Jika pihak lawan yang input, kirim notif ke pembuat untuk minta persetujuan
+            $this->sendFCM($transaction->creator->fcm_token, "Menunggu Persetujuan", $request->user()->name . " mencatat pembayaran baru. Cek sekarang!");
         }
 
-        // KIRIM NOTIFIKASI KE PIHAK LAWAN TEPAT SASARAN
-        $otherUserId = $isCreator ? $transaction->counterparty_id : $transaction->creator_id;
-        if ($otherUserId) {
-            $otherUser = \App\Models\User::find($otherUserId);
-            if ($otherUser && $otherUser->fcm_token) {
-                $rupiah = number_format($payment, 0, ',', '.');
-                if ($isCreator) {
-                    $title = "Pembayaran Baru 💰";
-                    $body = "Pembayaran sebesar Rp {$rupiah} telah dicatat untuk: " . $transaction->description;
-                } else {
-                    $title = "Menunggu Persetujuan ⏳";
-                    $body = "Pihak lawan mengajukan cicilan Rp {$rupiah}. Silakan setujui di aplikasi.";
-                }
-                \App\Services\FcmService::sendNotification($otherUser->fcm_token, $title, $body);
-            }
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => $isCreator ? 'Pembayaran berhasil dicatat' : 'Pembayaran diajukan, menunggu persetujuan',
-            'data' => $transaction->fresh(['logs', 'contact', 'counterparty'])
-        ]);
+        return response()->json(['success' => true, 'message' => 'Berhasil dicatat', 'data' => $transaction->fresh(['logs', 'contact', 'counterparty'])]);
     }
 
-    // FITUR BARU: TERIMA PEMBAYARAN
-    public function approvePayment(Request $request, $trxId, $logId)
+    public function approvePayment(Request $request, $id, $log_id)
     {
-        $userId = $request->user()->id;
-        $transaction = Transaction::where('id', $trxId)->where('creator_id', $userId)->firstOrFail();
-        $log = $transaction->logs()->where('id', $logId)->where('status', 'PENDING')->firstOrFail();
+        $transaction = Transaction::where('id', $id)->where('creator_id', $request->user()->id)->firstOrFail();
+        $log = $transaction->logs()->where('id', $log_id)->where('status', 'PENDING')->firstOrFail();
 
         $log->update(['status' => 'ACCEPTED']);
-
-        // Kurangi tagihan sekarang setelah disetujui
+        
         $newRemaining = max(0, $transaction->remaining_amount - $log->amount);
-        $transaction->remaining_amount = $newRemaining;
-        if ($newRemaining <= 0) $transaction->status = 'PAID';
-        $transaction->save();
+        $transaction->update(['remaining_amount' => $newRemaining, 'status' => $newRemaining <= 0 ? 'PAID' : 'ACTIVE']);
 
+        // Notifikasi ke pembayar bahwa disetujui
         if ($transaction->counterparty_id) {
-            $cp = \App\Models\User::find($transaction->counterparty_id);
-            if ($cp && $cp->fcm_token) \App\Services\FcmService::sendNotification($cp->fcm_token, "Disetujui ✅", "Pembayaran Rp " . number_format($log->amount, 0, ',', '.') . " diterima.");
+            $this->sendFCM($transaction->counterparty->fcm_token, "Pembayaran Disetujui ✅", "Pembayaran sebesar Rp " . number_format($log->amount, 0, ',', '.') . " telah dikonfirmasi.");
         }
 
-        return response()->json(['success' => true, 'message' => 'Disetujui']);
+        return response()->json(['success' => true]);
     }
 
-    // FITUR BARU: TOLAK PEMBAYARAN
-    public function rejectPayment(Request $request, $trxId, $logId)
+    public function rejectPayment(Request $request, $id, $log_id)
     {
-        $userId = $request->user()->id;
-        $transaction = Transaction::where('id', $trxId)->where('creator_id', $userId)->firstOrFail();
-        $log = $transaction->logs()->where('id', $logId)->where('status', 'PENDING')->firstOrFail();
+        $transaction = Transaction::where('id', $id)->where('creator_id', $request->user()->id)->firstOrFail();
+        $log = $transaction->logs()->where('id', $log_id)->where('status', 'PENDING')->firstOrFail();
 
         $log->update(['status' => 'DISPUTED']);
 
         if ($transaction->counterparty_id) {
-            $cp = \App\Models\User::find($transaction->counterparty_id);
-            if ($cp && $cp->fcm_token) \App\Services\FcmService::sendNotification($cp->fcm_token, "Ditolak ❌", "Bukti/nominal pembayaran Rp " . number_format($log->amount, 0, ',', '.') . " ditolak.");
+            $this->sendFCM($transaction->counterparty->fcm_token, "Pembayaran Ditolak ❌", "Bukti/nominal pembayaran Anda disanggah. Silakan periksa kembali.");
         }
 
-        return response()->json(['success' => true, 'message' => 'Ditolak']);
+        return response()->json(['success' => true]);
     }
 
     public function sync(Request $request, $token)

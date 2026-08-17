@@ -16,12 +16,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
     
-
-    // Tambahkan 4 baris ini untuk mengubah nama dan URL ke Bahasa Indonesia
-    protected static ?string $modelLabel = 'Pengguna';
-    protected static ?string $pluralModelLabel = 'Pengguna';
-    protected static ?string $navigationLabel = 'Pengguna';
-    protected static ?string $slug = 'pengguna';
+    protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
     public static function form(Form $form): Form
     {
@@ -44,6 +39,10 @@ class UserResource extends Resource
                     ])
                     ->required()
                     ->default('user'),
+                Forms\Components\Toggle::make('is_pro')
+                    ->label('Status Kasqt PRO')
+                    ->onColor('warning')
+                    ->default(false),
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
                     ->password()
@@ -66,6 +65,12 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_pro')
+                    ->label('PRO')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->trueColor('warning')
+                    ->falseIcon('heroicon-o-x-circle'),
                 Tables\Columns\BadgeColumn::make('role')
                     ->label('Peran')
                     ->colors([
@@ -78,7 +83,11 @@ class UserResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('is_pro')
+                    ->label('Status Langganan')
+                    ->placeholder('Semua Pengguna')
+                    ->trueLabel('Pengguna PRO')
+                    ->falseLabel('Pengguna Gratis'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
