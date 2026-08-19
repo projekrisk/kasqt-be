@@ -158,7 +158,7 @@
             </h1>
             
             <p class="text-lg text-slate-400 leading-relaxed max-w-md">
-                Ekosistem pencatatan hutang-piutang elegan untuk Anda. Transparan, aman dengan enkripsi, dan tersinkronisasi secara <span class="text-slate-200 font-medium">real-time</span>.
+                Ekosistem pencatatan hutang-piutang. Transparan, aman dengan enkripsi, dan tersinkronisasi secara <span class="text-slate-200 font-medium">real-time</span>.
             </p>
 
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4">

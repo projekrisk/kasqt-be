@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Services\FcmService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
@@ -64,30 +65,6 @@ class TransactionController extends Controller
         ], 201);
     }
 
-    private function sendFCM($deviceToken, $title, $body) 
-    {
-        if (!$deviceToken) return;
-        try {
-            $client = new \Google_Client();
-            $client->setAuthConfig(storage_path('firebase-credentials.json'));
-            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-            $client->fetchAccessTokenWithAssertion();
-            $token = $client->getAccessToken();
-
-            $credentials = json_decode(file_get_contents(storage_path('firebase-credentials.json')), true);
-            $projectId = $credentials['project_id'];
-
-            \Illuminate\Support\Facades\Http::withToken($token['access_token'])
-                ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
-                    'message' => [
-                        'token' => $deviceToken,
-                        'notification' => [ 'title' => $title, 'body' => $body ],
-                        'data' => [ 'action' => 'REFRESH_TRANSACTIONS' ]
-                    ]
-                ]);
-        } catch (\Exception $e) { \Illuminate\Support\Facades\Log::error("FCM Error: " . $e->getMessage()); }
-    }
-
     public function pay(Request $request, $id)
     {
         $request->validate([
@@ -101,7 +78,7 @@ class TransactionController extends Controller
         $proofImagePath = null;
         if ($request->hasFile('proof_image')) {
             $file = $request->file('proof_image');
-            $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $file->getClientOriginalExtension();
+            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
             $destinationPath = public_path('uploads/proofs');
             
             if (!file_exists($destinationPath)) { mkdir($destinationPath, 0755, true); }
@@ -124,14 +101,30 @@ class TransactionController extends Controller
             $newRemaining = max(0, $transaction->remaining_amount - $request->amount);
             $transaction->update(['remaining_amount' => $newRemaining, 'status' => $newRemaining <= 0 ? 'PAID' : 'ACTIVE']);
             
-            if ($transaction->counterparty_id) {
-                $this->sendFCM($transaction->counterparty->fcm_token, "Pembaruan Transaksi", "Tagihan Anda telah diperbarui sebesar Rp " . number_format($request->amount, 0, ',', '.'));
+            if ($transaction->counterparty_id && $transaction->counterparty->fcm_token) {
+                FcmService::sendNotification(
+                    $transaction->counterparty->fcm_token, 
+                    "Pembaruan Transaksi", 
+                    "Tagihan Anda telah diperbarui sebesar Rp " . number_format($request->amount, 0, ',', '.'),
+                    $transaction->id
+                );
             }
         } else {
-            $this->sendFCM($transaction->creator->fcm_token, "Menunggu Persetujuan", $request->user()->name . " mencatat pembayaran baru. Cek sekarang!");
+            if ($transaction->creator->fcm_token) {
+                FcmService::sendNotification(
+                    $transaction->creator->fcm_token, 
+                    "Menunggu Persetujuan", 
+                    $request->user()->name . " mencatat pembayaran baru. Cek sekarang!",
+                    $transaction->id
+                );
+            }
         }
 
-        return response()->json(['success' => true, 'message' => 'Berhasil dicatat', 'data' => $transaction->fresh(['logs', 'contact', 'counterparty'])]);
+        return response()->json([
+            'success' => true, 
+            'message' => 'Berhasil dicatat', 
+            'data' => $transaction->fresh(['logs', 'contact', 'counterparty'])
+        ]);
     }
 
     public function approvePayment(Request $request, $id, $log_id)
@@ -144,8 +137,13 @@ class TransactionController extends Controller
         $newRemaining = max(0, $transaction->remaining_amount - $log->amount);
         $transaction->update(['remaining_amount' => $newRemaining, 'status' => $newRemaining <= 0 ? 'PAID' : 'ACTIVE']);
 
-        if ($transaction->counterparty_id) {
-            $this->sendFCM($transaction->counterparty->fcm_token, "Pembayaran Disetujui ✅", "Pembayaran sebesar Rp " . number_format($log->amount, 0, ',', '.') . " telah dikonfirmasi.");
+        if ($transaction->counterparty_id && $transaction->counterparty->fcm_token) {
+            FcmService::sendNotification(
+                $transaction->counterparty->fcm_token, 
+                "Pembayaran Disetujui ✅", 
+                "Pembayaran sebesar Rp " . number_format($log->amount, 0, ',', '.') . " telah dikonfirmasi.",
+                $transaction->id
+            );
         }
 
         return response()->json(['success' => true]);
@@ -158,8 +156,13 @@ class TransactionController extends Controller
 
         $log->update(['status' => 'DISPUTED']);
 
-        if ($transaction->counterparty_id) {
-            $this->sendFCM($transaction->counterparty->fcm_token, "Pembayaran Ditolak ❌", "Bukti/nominal pembayaran Anda disanggah. Silakan periksa kembali.");
+        if ($transaction->counterparty_id && $transaction->counterparty->fcm_token) {
+            FcmService::sendNotification(
+                $transaction->counterparty->fcm_token, 
+                "Pembayaran Ditolak ❌", 
+                "Bukti/nominal pembayaran Anda disanggah. Silakan periksa kembali.",
+                $transaction->id
+            );
         }
 
         return response()->json(['success' => true]);
@@ -188,6 +191,15 @@ class TransactionController extends Controller
 
         $transaction->counterparty_id = $userId;
         $transaction->save();
+
+        if ($transaction->creator->fcm_token) {
+            FcmService::sendNotification(
+                $transaction->creator->fcm_token, 
+                "Transaksi Tertaut 🔗", 
+                $request->user()->name . " telah menyinkronkan transaksi ke akun mereka.",
+                $transaction->id
+            );
+        }
 
         return response()->json([
             'success' => true,

@@ -7,72 +7,60 @@ use Illuminate\Support\Facades\Log;
 
 class FcmService
 {
-    public static function sendNotification($token, $title, $body)
+    /**
+     * Fungsi untuk menembakkan Push Notification ke HP Android
+     */
+    public static function sendNotification($fcmToken, $title, $body, $transactionId = null)
     {
-        if (!$token) return false;
+        // Jika user belum pernah login di Android, batalkan pengiriman
+        if (empty($fcmToken)) {
+            return false;
+        }
 
         try {
-            $credentialsFilePath = storage_path('firebase-credentials.json');
-            if (!file_exists($credentialsFilePath)) {
-                Log::error('FCM Error: File firebase-credentials.json tidak ditemukan di folder storage.');
-                return false;
-            }
+            // 1. Inisialisasi Google Client menggunakan file kredensial rahasia Firebase
+            $client = new \Google_Client();
+            $client->setAuthConfig(storage_path('firebase-credentials.json'));
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            
+            // Bypass SSL untuk localhost (Sama seperti saat Login Google)
+            $guzzleClient = new \GuzzleHttp\Client(['verify' => false]);
+            $client->setHttpClient($guzzleClient);
+            
+            // 2. Dapatkan Token Akses Otentikasi (Berlaku 1 jam)
+            $client->fetchAccessTokenWithAssertion();
+            $accessToken = $client->getAccessToken()['access_token'];
 
-            $credentials = json_decode(file_get_contents($credentialsFilePath), true);
-            $projectId = $credentials['project_id'];
-            $clientEmail = $credentials['client_email'];
-            $privateKey = $credentials['private_key'];
-
-            $header = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
-            $now = time();
-            $payload = json_encode([
-                'iss' => $clientEmail,
-                'scope' => 'https://www.googleapis.com/auth/firebase.messaging',
-                'aud' => 'https://oauth2.googleapis.com/token',
-                'exp' => $now + 3600,
-                'iat' => $now
-            ]);
-
-            $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
-            $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
-
-            openssl_sign($base64UrlHeader . "." . $base64UrlPayload, $signature, $privateKey, OPENSSL_ALGO_SHA256);
-            $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
-
-            $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-
-            $tokenResponse = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion' => $jwt
-            ]);
-
-            if (!$tokenResponse->successful()) {
-                Log::error('FCM Token Error: ' . $tokenResponse->body());
-                return false;
-            }
-
-            $accessToken = $tokenResponse->json('access_token');
-
-            $fcmUrl = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
-            $messageData = [
+            // 3. Siapkan URL API Firebase v1
+            $projectId = env('FIREBASE_PROJECT_ID'); 
+            $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+            
+            // 4. Rakit Pesan (Judul, Isi, dan Data ID Transaksi)
+            $payload = [
                 'message' => [
-                    'token' => $token,
+                    'token' => $fcmToken,
                     'notification' => [
                         'title' => $title,
                         'body' => $body
                     ],
-                    'data' => [ 
-                        'title' => $title,
-                        'body' => $body
-                    ]
+                    'data' => []
                 ]
             ];
 
-            $response = Http::withToken($accessToken)->post($fcmUrl, $messageData);
+            // Sisipkan ID Transaksi agar notifikasi bisa diklik dari Android
+            if ($transactionId) {
+                $payload['message']['data']['transaction_id'] = (string) $transactionId;
+            }
+
+            // 5. Tembakkan ke Google Server!
+            $response = Http::withOptions(['verify' => false])
+                ->withToken($accessToken)
+                ->post($url, $payload);
+
             return $response->successful();
 
         } catch (\Exception $e) {
-            Log::error('FCM Send Error: ' . $e->getMessage());
+            Log::error('Gagal Mengirim FCM: ' . $e->getMessage());
             return false;
         }
     }
