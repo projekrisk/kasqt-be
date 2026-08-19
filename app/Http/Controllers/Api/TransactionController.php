@@ -196,7 +196,7 @@ class TransactionController extends Controller
             FcmService::sendNotification(
                 $transaction->creator->fcm_token, 
                 "Transaksi Tertaut 🔗", 
-                $request->user()->name . " telah menyinkronkan transaksi ke akun mereka.",
+                $request->user()->name . " telah menyinkronkan transaksi ke akunnya.",
                 $transaction->id
             );
         }
