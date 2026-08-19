@@ -142,7 +142,7 @@ class ContactController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => $addedCount . ' Teman Kasqt berhasil ditemukan & disinkronkan!'
+            'message' => $addedCount . ' kontak Kasqt berhasil ditemukan!'
         ]);
     }
 }
