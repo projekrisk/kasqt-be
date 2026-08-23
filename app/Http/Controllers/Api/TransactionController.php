@@ -43,20 +43,27 @@ class TransactionController extends Controller
             'contact_id' => 'nullable|exists:contacts,id',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
-        $transaction = Transaction::create([
-            'creator_id' => $request->user()->id,
-            'contact_id' => $request->contact_id,
-            'counterparty_id' => null,
-            'type' => $request->type,
-            'amount' => $request->amount,
-            'remaining_amount' => $request->amount,
-            'due_date' => $request->due_date,
-            'status' => 'ACTIVE',
-            'description' => $request->description,
-            'token' => Str::random(12), 
-        ]);
+        $transaction = new Transaction();
+        $transaction->creator_id = $request->user()->id;
+        $transaction->contact_id = $request->contact_id;
+        $transaction->counterparty_id = null;
+        $transaction->type = $request->type;
+        $transaction->amount = $request->amount;
+        $transaction->remaining_amount = $request->amount;
+        $transaction->due_date = $request->due_date;
+        $transaction->status = 'ACTIVE';
+        $transaction->description = $request->description;
+        $transaction->token = Str::random(12);
+
+        if ($request->transaction_date) {
+            $transaction->created_at = $request->transaction_date;
+            $transaction->updated_at = $request->transaction_date;
+        }
+
+        $transaction->save();
 
         return response()->json([
             'success' => true,
