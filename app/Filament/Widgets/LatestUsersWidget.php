@@ -20,8 +20,7 @@ class LatestUsersWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nama')
-                    ->searchable(),
+                    ->label('Nama'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Waktu Daftar')
                     ->since()
