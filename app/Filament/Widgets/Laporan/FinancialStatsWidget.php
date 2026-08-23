@@ -14,7 +14,7 @@ class FinancialStatsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalPro = User::where('is_pro', true)->count();
+        $totalPro = User::whereNotNull('pro_expires_at')->where('pro_expires_at', '>', now())->count();
         
         $proTahunan = (int) ceil($totalPro * 0.7);
         $proBulanan = $totalPro - $proTahunan;

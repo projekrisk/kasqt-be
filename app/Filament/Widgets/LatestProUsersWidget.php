@@ -16,7 +16,7 @@ class LatestProUsersWidget extends BaseWidget
     {
         return $table
             ->query(
-                User::query()->where('is_pro', true)->latest()->limit(5)
+                User::query()->whereNotNull('pro_expires_at')->where('pro_expires_at', '>', now())->latest()->limit(5)
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -24,6 +24,7 @@ class LatestProUsersWidget extends BaseWidget
                 Tables\Columns\IconColumn::make('is_pro')
                     ->label('Status')
                     ->boolean()
+                    ->getStateUsing(fn ($record): bool => $record->is_pro)
                     ->trueIcon('heroicon-o-check-badge'), 
             ])
             ->paginated(false)

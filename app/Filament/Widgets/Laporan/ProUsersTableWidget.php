@@ -17,7 +17,7 @@ class ProUsersTableWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(User::where('is_pro', true)->latest())
+            ->query(User::whereNotNull('pro_expires_at')->where('pro_expires_at', '>', now())->latest())
             ->columns([
                 Tables\Columns\ImageColumn::make('avatar_url')
                     ->label('Avatar')
