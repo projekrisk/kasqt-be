@@ -9,7 +9,6 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class LatestProUsersWidget extends BaseWidget
 {
-    // Mengambil 1 slot (setengah layar) agar widget bisa berdampingan
     protected int | string | array $columnSpan = 1;
     protected static ?int $sort = 3;
 
@@ -17,7 +16,6 @@ class LatestProUsersWidget extends BaseWidget
     {
         return $table
             ->query(
-                // Filter hanya yang is_pro = true
                 User::query()->where('is_pro', true)->latest()->limit(5)
             )
             ->columns([
@@ -25,7 +23,7 @@ class LatestProUsersWidget extends BaseWidget
                     ->label('Nama'),
                 Tables\Columns\IconColumn::make('is_pro')
                     ->label('Status')
-                    ->boolean() // Menampilkan icon checklist hijau
+                    ->boolean()
                     ->trueIcon('heroicon-o-check-badge'), 
             ])
             ->paginated(false)
