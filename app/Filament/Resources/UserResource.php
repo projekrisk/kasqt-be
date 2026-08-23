@@ -13,9 +13,10 @@ use Filament\Tables\Table;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationGroup = 'Manajemen';
-    protected static ?string $modelLabel = 'Pengguna';
+    
+    protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
     public static function form(Form $form): Form
     {
@@ -38,10 +39,9 @@ class UserResource extends Resource
                     ])
                     ->required()
                     ->default('user'),
-                Forms\Components\Toggle::make('is_pro')
-                    ->label('Status Kasqt PRO')
-                    ->onColor('warning')
-                    ->default(false),
+                Forms\Components\DateTimePicker::make('pro_expires_at')
+                    ->label('Batas Aktif PRO')
+                    ->placeholder('Kosongkan jika pengguna gratis'),
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
                     ->password()
@@ -67,9 +67,15 @@ class UserResource extends Resource
                 Tables\Columns\IconColumn::make('is_pro')
                     ->label('PRO')
                     ->boolean()
+                    ->getStateUsing(fn ($record): bool => $record->is_pro)
                     ->trueIcon('heroicon-o-star')
                     ->trueColor('warning')
                     ->falseIcon('heroicon-o-x-circle'),
+                Tables\Columns\TextColumn::make('pro_expires_at')
+                    ->label('Masa Aktif')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\BadgeColumn::make('role')
                     ->label('Peran')
                     ->colors([
@@ -86,7 +92,14 @@ class UserResource extends Resource
                     ->label('Status Langganan')
                     ->placeholder('Semua Pengguna')
                     ->trueLabel('Pengguna PRO')
-                    ->falseLabel('Pengguna Gratis'),
+                    ->falseLabel('Pengguna Gratis')
+                    ->queries(
+                        true: fn ($query) => $query->whereNotNull('pro_expires_at')->where('pro_expires_at', '>', now()),
+                        false: fn ($query) => $query->where(function ($q) {
+                            $q->whereNull('pro_expires_at')->orWhere('pro_expires_at', '<=', now());
+                        }),
+                        blank: fn ($query) => $query,
+                    ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

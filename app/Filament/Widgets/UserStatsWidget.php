@@ -18,13 +18,15 @@ class UserStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-users')
                 ->color('primary'),
                 
-            Stat::make('Pengguna PRO', User::where('is_pro', true)->count())
+            Stat::make('Pengguna PRO', User::whereNotNull('pro_expires_at')->where('pro_expires_at', '>', now())->count())
                 ->description('Membayar langganan')
                 ->descriptionIcon('heroicon-m-star')
                 ->color('warning')
-                ->chart([7, 2, 10, 3, 15, 4, 17]),
+                ->chart([7, 2, 10, 3, 15, 4, 17]), // Grafik simulasi naik-turun
                 
-            Stat::make('Pengguna Gratis', User::where('is_pro', false)->count())
+            Stat::make('Pengguna Gratis', User::where(function ($query) {
+                $query->whereNull('pro_expires_at')->orWhere('pro_expires_at', '<=', now());
+            })->count())
                 ->description('Belum berlangganan')
                 ->color('gray'),
         ];
