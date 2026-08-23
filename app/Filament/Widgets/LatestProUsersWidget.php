@@ -27,6 +27,6 @@ class LatestProUsersWidget extends BaseWidget
                     ->trueIcon('heroicon-o-check-badge'), 
             ])
             ->paginated(false)
-            ->heading('🌟 5 Pengguna PRO Terbaru');
+            ->heading('Pengguna PRO Terbaru');
     }
 }

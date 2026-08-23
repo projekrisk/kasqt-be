@@ -28,6 +28,6 @@ class LatestUsersWidget extends BaseWidget
                     ->sortable(),
             ])
             ->paginated(false)
-            ->heading('👥 5 Pengguna Baru');
+            ->heading('Pengguna Baru');
     }
 }
