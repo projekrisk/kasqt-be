@@ -81,9 +81,13 @@ class TransactionController extends Controller
             $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
             $destinationPath = public_path('uploads/proofs');
             
-            if (!file_exists($destinationPath)) { mkdir($destinationPath, 0755, true); }
+            if (!file_exists($destinationPath)) { 
+                mkdir($destinationPath, 0755, true); 
+            }
+            
             $file->move($destinationPath, $filename);
-            $proofImagePath = 'uploads/proofs/' . $filename;
+            
+            $proofImagePath = url('uploads/proofs/' . $filename);
         }
 
         $isCreator = $transaction->creator_id === $userId;
