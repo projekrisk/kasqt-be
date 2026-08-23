@@ -27,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('Kasqt')
+            ->favicon(asset('images/icon.png'))
             ->login()
             ->colors([
                 'primary' => Color::Amber,

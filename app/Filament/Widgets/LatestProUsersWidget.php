@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use App\Models\User;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget as BaseWidget;
+
+class LatestProUsersWidget extends BaseWidget
+{
+    // Mengambil 1 slot (setengah layar) agar widget bisa berdampingan
+    protected int | string | array $columnSpan = 1;
+    protected static ?int $sort = 3;
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(
+                // Filter hanya yang is_pro = true
+                User::query()->where('is_pro', true)->latest()->limit(5)
+            )
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nama'),
+                Tables\Columns\IconColumn::make('is_pro')
+                    ->label('Status')
+                    ->boolean() // Menampilkan icon checklist hijau
+                    ->trueIcon('heroicon-o-check-badge'), 
+            ])
+            ->paginated(false)
+            ->heading('🌟 5 Pengguna PRO Terbaru');
+    }
+}
