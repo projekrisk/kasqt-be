@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasqt | Catat Finansial, Jaga Relasi</title>
+    <title>Kasqt - Catat Finansial, Jaga Relasi</title>
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
 
     <meta name="description" content="Aplikasi pencatatan hutang-piutang dan keuangan kolaboratif yang aman, elegan, dan tersinkronisasi secara real-time. Kelola sirkulasi dana Anda dengan Kasqt.">
