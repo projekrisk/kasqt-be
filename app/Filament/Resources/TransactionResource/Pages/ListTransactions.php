@@ -16,4 +16,11 @@ class ListTransactions extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\TransactionResource\Widgets\TransactionStatsWidget::class,
+        ];
+    }
 }
