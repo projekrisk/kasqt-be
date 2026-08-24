@@ -43,6 +43,8 @@ class UserResource extends Resource
                     ->default('user'),
                 Forms\Components\DateTimePicker::make('pro_expires_at')
                     ->label('Batas Aktif PRO')
+                    ->timezone('Asia/Jakarta')
+                    ->native(false)
                     ->placeholder('Kosongkan jika pengguna gratis'),
                 Forms\Components\TextInput::make('password')
                     ->label('Password')
@@ -55,6 +57,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->poll('10s')
             ->columns([
                 Tables\Columns\ImageColumn::make('avatar_url')
                     ->label('Avatar')
@@ -75,7 +78,7 @@ class UserResource extends Resource
                     ->falseIcon('heroicon-o-x-circle'),
                 Tables\Columns\TextColumn::make('pro_expires_at')
                     ->label('Masa Aktif')
-                    ->dateTime()
+                    ->dateTime('d M Y, H:i', 'Asia/Jakarta')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\BadgeColumn::make('role')
