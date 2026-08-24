@@ -12,7 +12,7 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="Undangan Transaksi | Kasqt">
     <meta property="og:description" content="Teman Anda membagikan rincian catatan hutang/piutang. Buka aplikasi Kasqt untuk menyinkronkan transaksi ini secara otomatis.">
-    <meta property="og:image" content="{{ asset('images/og-kasqt.jpg') }}">
+    <meta property="og:image" content="{{ asset('images/og-kasqt.png') }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -20,7 +20,7 @@
     <meta property="twitter:url" content="{{ url()->current() }}">
     <meta property="twitter:title" content="Undangan Transaksi | Kasqt">
     <meta property="twitter:description" content="Teman Anda membagikan rincian catatan hutang/piutang. Buka aplikasi Kasqt untuk menyinkronkan transaksi ini secara otomatis.">
-    <meta property="twitter:image" content="{{ asset('images/og-kasqt.jpg') }}">
+    <meta property="twitter:image" content="{{ asset('images/og-kasqt.png') }}">
 
     <link rel="icon" type="image/png" href="{{ asset('images/icon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
