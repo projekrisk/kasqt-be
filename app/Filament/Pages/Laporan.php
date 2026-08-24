@@ -19,7 +19,7 @@ class Laporan extends Page
             \App\Filament\Widgets\Laporan\FinancialStatsWidget::class,
             \App\Filament\Widgets\Laporan\UsersChart::class,
             \App\Filament\Widgets\Laporan\TransactionsChart::class,
-            \App\Filament\Widgets\Laporan\ProUsersTableWidget::class,
+            // App\Filament\Widgets\Laporan\ProUsersTableWidget::class,
         ];
     }
 }
