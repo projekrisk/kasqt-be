@@ -95,4 +95,32 @@ class AuthController extends Controller
         
         return response()->json(['success' => true, 'message' => 'Nomor WA Anda berhasil disimpan!']);
     }
+
+    public function upgradePro(Request $request)
+    {
+        $request->validate([
+            'plan' => 'required|in:monthly,yearly'
+        ]);
+        
+        $user = $request->user();
+        $now = now();
+        
+        $baseDate = ($user->pro_expires_at && $user->pro_expires_at->isFuture()) 
+                    ? $user->pro_expires_at 
+                    : $now;
+
+        if ($request->plan === 'yearly') {
+            $user->pro_expires_at = $baseDate->addYears(1);
+        } else {
+            $user->pro_expires_at = $baseDate->addMonths(1);
+        }
+        
+        $user->save();
+        
+        return response()->json([
+            'success' => true, 
+            'message' => 'Berhasil upgrade ke paket ' . $request->plan,
+            'data' => $user
+        ]);
+    }
 }
