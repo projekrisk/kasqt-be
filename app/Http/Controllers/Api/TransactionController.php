@@ -43,7 +43,8 @@ class TransactionController extends Controller
             'contact_id' => 'nullable|exists:contacts,id',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'transaction_date' => 'nullable|date',
+            // Pastikan validasi menerima created_at
+            'created_at' => 'nullable|date_format:Y-m-d H:i:s',
         ]);
 
         $transaction = new Transaction();
@@ -58,9 +59,10 @@ class TransactionController extends Controller
         $transaction->description = $request->description;
         $transaction->token = Str::random(12);
 
-        if ($request->transaction_date) {
-            $transaction->created_at = $request->transaction_date;
-            $transaction->updated_at = $request->transaction_date;
+        // PERBAIKAN DI SINI: Tangkap 'created_at' dari Android, bukan 'transaction_date'
+        if ($request->has('created_at') && $request->created_at != null) {
+            $transaction->created_at = $request->created_at;
+            $transaction->updated_at = $request->created_at;
         }
 
         $transaction->save();

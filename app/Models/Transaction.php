@@ -8,7 +8,7 @@ class Transaction extends Model
 {
     protected $fillable = [
         'creator_id', 'contact_id', 'counterparty_id', 'type', 
-        'amount', 'remaining_amount', 'due_date', 'status', 'description', 'token'
+        'amount', 'remaining_amount', 'due_date', 'status', 'description', 'token', 'created_at'
     ];
 
     public function creator()
